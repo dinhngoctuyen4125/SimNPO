@@ -4,7 +4,7 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 cd simnpo
 
-python unlearn.py \
+/home/ritsu/miniconda3/envs/simnpo/bin/python unlearn.py \
     --algo simnpo_gdr \
     --model_dir codellama/CodeLlama-7b-hf \
     --data_file ../../Data-Collection/codellama/D_forget.json \
