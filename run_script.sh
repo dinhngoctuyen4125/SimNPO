@@ -7,7 +7,7 @@ cd simnpo
 python unlearn.py \
     --algo simnpo_gdr \
     --model_dir codellama/CodeLlama-7b-hf \
-    --data_file ./Data-Collection/data/codellama/D_forget.json \
+    --data_file ../Data-Collection/data/codellama/D_forget.json \
     --out_dir ./ckpt/simnpo_gdr \
     --max_len 256 \
     --epochs 2 \
