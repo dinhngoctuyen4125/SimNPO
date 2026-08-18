@@ -9,7 +9,7 @@ A framework for removing deprecated API knowledge from Large Language Models usi
 ├── requirements.txt                  # Dependencies
 ├── data/
 │   └── codellama/
-│       └── depAPI.json
+│       └── D_forget.json
 └── simnpo/
     ├── unlearn.py                # CLI entry point
     └── baselines/
@@ -64,12 +64,13 @@ bash run_script.sh
 
 ### Data Format
 
-Input JSON file (`depAPI.json`) — each item contains:
+Input JSON file (`D_forget.json`) — each item contains:
 
 ```json
 {
-    "probing input": "code context using deprecated API...",
-    "forget": "deprecated API usage to unlearn",
+    "probing input": "code context before the API call...",
+    "y_neg": "continuation using deprecated API (to unlearn)",
+    "y_pos": "continuation using replacement API (correct answer)",
     "retain": "clean code to preserve capability"
 }
 ```

@@ -197,7 +197,7 @@ class DepAPIDataset(Dataset):
 
     def __getitem__(self, idx):
         item = self.data[idx]
-        forget_text = item["probing input"] + item["forget"]
+        forget_text = item["probing input"] + item["y_neg"]
         retain_text = item["retain"]
         return self._tokenize(forget_text), self._tokenize(retain_text)
 
