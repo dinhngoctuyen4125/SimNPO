@@ -293,7 +293,10 @@ class LoraModel(BaseTuner):
 
         new_module = None
         for dispatcher in dispatchers:
-            new_module = dispatcher(target, adapter_name, lora_config=lora_config, **kwargs)
+            try:
+                new_module = dispatcher(target, adapter_name, config=lora_config, **kwargs)
+            except TypeError:
+                new_module = dispatcher(target, adapter_name, lora_config=lora_config, **kwargs)
             if new_module is not None:  # first match wins
                 break
 
