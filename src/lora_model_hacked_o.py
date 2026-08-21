@@ -293,10 +293,7 @@ class LoraModel(BaseTuner):
 
         new_module = None
         for dispatcher in dispatchers:
-            try:
-                new_module = dispatcher(target, adapter_name, config=lora_config, **kwargs)
-            except TypeError:
-                new_module = dispatcher(target, adapter_name, lora_config=lora_config, **kwargs)
+            new_module = dispatcher(target, adapter_name, lora_config=lora_config, **kwargs)
             if new_module is not None:  # first match wins
                 break
 
@@ -352,7 +349,7 @@ class LoraModel(BaseTuner):
                 warnings.warn(msg)
         self._set_adapter_layers(enabled=False)
 
-    def set_adapter(self, adapter_name: str | list[str], **kwargs) -> None:
+    def set_adapter(self, adapter_name: str | list[str]) -> None:
         """Set the active adapter(s).
 
         Additionally, this function will set the specified adapters to trainable (i.e., requires_grad=True). If this is
