@@ -18,7 +18,7 @@ do
 
     # Eval on D_test.json
     TESTPATH_1="../Data-Collection/codellama/D_test.json"
-    /home/ritsu/miniconda3/envs/simnpo/bin/pytho eval_o3.py \
+    /home/ritsu/miniconda3/envs/simnpo/bin/python eval_o3.py \
       --test_dataset ${TESTPATH_1} \
       --base_model ${BASE_MODEL} \
       --seed ${SEED} \
