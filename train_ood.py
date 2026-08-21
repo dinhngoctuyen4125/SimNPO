@@ -4,9 +4,10 @@ from tqdm import tqdm
 import numpy as np
 from torch.utils.data import DataLoader
 from transformers import RobertaConfig, RobertaTokenizer, BertConfig, BertTokenizer
-from transformers.optimization import AdamW, get_linear_schedule_with_warmup
+from torch.optim import AdamW
+from transformers.optimization import get_linear_schedule_with_warmup
 from src.ood_utils import set_seed, collate_fn_mlm, collate_fn, detection_performance
-from datasets import load_metric
+
 from sklearn import svm
 from sklearn.mixture import GaussianMixture as GMM
 from sklearn.cluster import DBSCAN, KMeans
