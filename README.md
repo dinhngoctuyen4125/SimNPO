@@ -95,7 +95,7 @@ pip install -r requirements.txt
 ### Stage 1: Train SimNPO LoRA (Unlearn Deprecated APIs)
 
 ```bash
-bash run_script.sh
+nohup bash run_script.sh > run_simnpo.log 2>&1 &
 ```
 
 Trains a LoRA adapter (rank=8, `q_proj` + `v_proj`) on CodeLlama-7b using SimNPO loss to unlearn deprecated API knowledge while preserving general capability via retain loss (GDR).
@@ -133,7 +133,7 @@ Trains a LoRA adapter (rank=8, `q_proj` + `v_proj`) on CodeLlama-7b using SimNPO
 ### Stage 2: Train OOD Detector
 
 ```bash
-bash train_ood.sh
+nohup bash train_ood.sh > run_ood.log 2>&1 &
 ```
 
 Trains a RoBERTa-based (CodeBERT) OOD detector using contrastive learning to distinguish "forget domain" inputs from general inputs. After each epoch, fits a One-Class SVM and GMM for scoring.
@@ -167,7 +167,7 @@ Trains a RoBERTa-based (CodeBERT) OOD detector using contrastive learning to dis
 ### Stage 3: Soft-Weighted Inference
 
 ```bash
-bash eval_soft_infer.sh
+nohup bash eval_soft_infer.sh > sim_ood.log 2>&1 &
 ```
 
 Combines the trained OOD detector with the SimNPO LoRA adapter for inference. For each input, the OOD detector computes a per-sample weight `w(x)` that modulates the LoRA contribution:
