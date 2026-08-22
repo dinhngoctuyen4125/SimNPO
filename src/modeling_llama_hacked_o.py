@@ -344,28 +344,34 @@ class LlamaAttention(nn.Module):
                     if 'q_proj' in self.lora_target_modules:
                         query_states, o_l1 = self.q_proj(hidden_states, active_adapters_d, ood_weight, o_lora_input)
                         o_loss =o_loss + o_l1
-                        # query_states = query_states[0]
+                    else:
+                        query_states = self.q_proj(hidden_states)
                     if 'v_proj' in self.lora_target_modules:
                         value_states, o_l2 = self.v_proj(hidden_states, active_adapters_d, ood_weight, o_lora_input)
                         o_loss = o_loss + o_l2
-                        # value_states = value_states[0]
+                    else:
+                        value_states = self.v_proj(hidden_states)
                     if 'k_proj' in self.lora_target_modules:
                         key_states, o_l3 = self.k_proj(hidden_states, active_adapters_d, ood_weight, o_lora_input)
                         o_loss = o_loss + o_l3
+                    else:
+                        key_states = self.k_proj(hidden_states)
                 else:
                     if 'q_proj' in self.lora_target_modules:
                         query_states, o_l1 = self.q_proj(hidden_states, active_adapters_d, ood_weight, o_lora_layer['self_attn.q_proj'])
                         o_loss =o_loss + o_l1
-                        # query_states = query_states[0]
+                    else:
+                        query_states = self.q_proj(hidden_states)
                     if 'v_proj' in self.lora_target_modules:
                         value_states, o_l2 = self.v_proj(hidden_states, active_adapters_d, ood_weight, o_lora_layer['self_attn.v_proj'])
                         o_loss = o_loss + o_l2
-                        # value_states = value_states[0]
+                    else:
+                        value_states = self.v_proj(hidden_states)
                     if 'k_proj' in self.lora_target_modules:
                         key_states, o_l3 = self.k_proj(hidden_states, active_adapters_d, ood_weight, o_lora_layer['self_attn.k_proj'])
                         o_loss = o_loss + o_l3
-                        # mid_loss += key_states[1]
-                        # key_states = key_states[0]
+                    else:
+                        key_states = self.k_proj(hidden_states)
             else:
                 query_states = self.q_proj(hidden_states)
                 key_states = self.k_proj(hidden_states)
