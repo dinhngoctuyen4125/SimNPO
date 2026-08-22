@@ -13,17 +13,17 @@ pip install -r requirements.txt
 ### Stage 1: Train SimNPO LoRA (Unlearn Deprecated APIs)
 
 ```bash
-sudo nohup bash run_script.sh > run_simnpo.log 2>&1 &
+sudo nohup bash run_script.sh > logs/run_simnpo.log 2>&1 &
 ```
 
 ### Stage 2: Train OOD Detector
 
 ```bash
-sudo nohup bash train_ood.sh > run_ood.log 2>&1 &
+sudo nohup bash train_ood.sh > logs/run_ood.log 2>&1 &
 ```
 
 ### Stage 3: Soft-Weighted Inference
 
 ```bash
-sudo nohup bash eval_soft_infer.sh > sim_ood.log 2>&1 &
+sudo nohup bash eval_soft_infer.sh > logs/sim_ood.log 2>&1 &
 ```
