@@ -516,7 +516,7 @@ class LlamaDecoderLayer(nn.Module):
             o_loss += o_m
             # hidden_states = hidden_states[0]
         else:
-            hidden_states = self.mlp(hidden_states)
+            hidden_states = self.mlp(hidden_states, active_adapters_d, ood_weight, o_lora_layer)
         hidden_states = residual + hidden_states
 
         outputs = (hidden_states,)
