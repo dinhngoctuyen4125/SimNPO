@@ -16,6 +16,11 @@ pip install -r requirements.txt
 sudo nohup bash run_script.sh > logs/run_simnpo.log 2>&1 &
 ```
 
+*(Tùy chọn)* Đánh giá mis/rep/dep API sau khi train SimNPO (trên tập D_test):
+```bash
+sudo nohup bash forget_quality.sh > logs/run_forget.log 2>&1 &
+```
+
 ### Stage 2: Train OOD Detector
 
 ```bash
