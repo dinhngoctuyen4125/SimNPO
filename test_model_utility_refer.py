@@ -15,7 +15,6 @@ from tqdm.auto import tqdm
 
 from datasets import load_dataset
 from transformers import set_seed, AutoModelForCausalLM, AutoTokenizer, RobertaTokenizer
-from peft import PeftModel
 from src.ood_model_selector import RobertaForSelector_inference
 
 
@@ -42,12 +41,7 @@ def obtain_weights(input_x, gmm, x0):
 
 
 class DeltaWeightManager:
-    """Forward-hook hệ thống: output = base_out + w(x) * (W_prod - W_base) · x
-    
-    Thay thế hacked model: pre-compute ΔW = W_merged - W_base một lần,
-    rồi dùng forward hooks để cộng w * ΔW @ x vào output mỗi layer.
-    Toán học tương đương với runtime LoRA nhưng nhanh hơn nhiều.
-    """
+    """Forward-hook hệ thống: output = base_out + w(x) * (W_prod - W_base) · x"""
     def __init__(self):
         self.ood_weight = 0
         self._hooks = []
@@ -83,6 +77,7 @@ class DeltaWeightManager:
         return hook
 
     def set_weight(self, w): self.ood_weight = w
+
 
 
 def sample_code_from_llm(args, prompt, model, tokenizer):
@@ -158,18 +153,13 @@ def load_model_tokenizer(args, model_name, model_path):
         model_path = model_path
     else:
         model_path = model_name
-
+        
     model = AutoModelForCausalLM.from_pretrained(
         model_path, 
         low_cpu_mem_usage=True, 
         torch_dtype="auto", 
         device_map="auto"
     )
-
-    if args.lora_path:
-        model = PeftModel.from_pretrained(model, args.lora_path)
-        model = model.merge_and_unload()
-
     try:
         tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     except:
@@ -192,28 +182,17 @@ def generate_code_for_tasks(args, except_tasks, save_file):
     csv_file = save_file.replace(".jsonl", ".csv")
 
     manager = None
-    ood_components = None
+    ood_components = None  # (ood_model, ood_tokenizer, ood_clr, ood_gmm, ood_x0)
 
     if getattr(args, 'ood_weights', None):
-        # --- OOD mode: base on GPU + delta-W hooks (thay thế hacked model) ---
-        # Toán học tương đương: ΔW = W_merged - W_base = LoRA contribution
-        print("\n=== Loading Base + LoRA (merged) + OOD ===")
-        base_path = args.model_path if args.model_path else args.model_name
-
-        tokenizer = AutoTokenizer.from_pretrained(base_path, trust_remote_code=True)
+        # --- PROD+OOD mode: base on GPU, delta-W hooks ---
+        print("\n=== Loading Base + PROD + OOD ===")
+        tokenizer = AutoTokenizer.from_pretrained(args.model_name, trust_remote_code=True)
         tokenizer.pad_token = tokenizer.eos_token
-
-        # Load base model on GPU
         base_model = AutoModelForCausalLM.from_pretrained(
-            base_path, torch_dtype=torch.bfloat16, device_map="auto", low_cpu_mem_usage=True)
-
-        # Build prod model on CPU: base + LoRA → merge
+            args.model_name, torch_dtype=torch.bfloat16, device_map="auto", low_cpu_mem_usage=True)
         prod_model = AutoModelForCausalLM.from_pretrained(
-            base_path, torch_dtype=torch.bfloat16, device_map="cpu", low_cpu_mem_usage=True)
-        prod_model = PeftModel.from_pretrained(prod_model, args.lora_path, torch_dtype=torch.bfloat16)
-        prod_model = prod_model.merge_and_unload()
-
-        # Tính ΔW = W_merged - W_base, đăng ký hooks lên base model
+            args.model_path, torch_dtype=torch.bfloat16, device_map="cpu", low_cpu_mem_usage=True)
         tgt = ["q_proj","k_proj","v_proj","o_proj","gate_proj","up_proj","down_proj"]
         manager = DeltaWeightManager.compute_and_register(base_model, prod_model, tgt)
         del prod_model; torch.cuda.empty_cache() if torch.cuda.is_available() else None
@@ -229,7 +208,7 @@ def generate_code_for_tasks(args, except_tasks, save_file):
         with open(wp+"_ocsvm.pkl","rb") as fp: ood_clr = pickle.load(fp)
         with open(wp+"_gmm_w_ocsvm.pkl","rb") as fp: ood_gmm = pickle.load(fp)
         with open(wp+"_threshold_ocsvm.json") as fp: th = json.load(fp)
-
+        
         # Load additional lists for get_unsup_Mah_score_s
         ood_mean = torch.load(wp+"_mean_list_ocsvm.pt", map_location=torch.device(device))
         ood_prec = torch.load(wp+"_precision_list_ocsvm.pt", map_location=torch.device(device))
@@ -238,7 +217,7 @@ def generate_code_for_tasks(args, except_tasks, save_file):
         ood_components = (ood_mdl, ood_tok, ood_clr, ood_gmm, th[0], ood_mean, ood_prec, ood_fea)
         print("OOD detector loaded.")
     else:
-        # --- Normal mode (non-OOD) ---
+        # --- Normal mode ---
         generate_code_fn, tokenizer = load_model_tokenizer(args, args.model_name, args.model_path)
 
     # load dataset
@@ -266,10 +245,10 @@ def generate_code_for_tasks(args, except_tasks, save_file):
         if manager and ood_components:
             ood_mdl, ood_tok, ood_clr, ood_gmm, ood_x0, ood_mean, ood_prec, ood_fea = ood_components
             enc = ood_tok(prompt, padding=True, truncation=True, max_length=512, return_tensors='pt')
-
+            
             with torch.no_grad():
                 mah_score = ood_mdl.get_unsup_Mah_score_s(enc, ood_mean, ood_prec, ood_fea)[:, 1:]
-
+            
             test_score = ood_clr.score_samples(mah_score)
             w = obtain_weights(test_score[0], ood_gmm, ood_x0)
             manager.set_weight(w)
@@ -317,8 +296,11 @@ def generate_code_for_tasks(args, except_tasks, save_file):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_name", default="CodeLlama-7b-hf")
-    parser.add_argument("--lora_path", default=None, help="Path to LoRA adapter checkpoint. If provided, will merge LoRA weights into base model.")
-    parser.add_argument("--model_path", default=None, help="Directory where a pre-trained LLM or fine-tuned LLM is saved. If None, will load from huggingface cache.",)
+    parser.add_argument("--model_path", default=None, help="PROD checkpoint path (full fine-tuned model).")
+    parser.add_argument("--ood_weights", default=None, type=str, help="OOD checkpoint dir. If set, uses PROD+OOD mode.")
+    parser.add_argument("--ood_base_model", default="microsoft/codebert-base", type=str)
+    parser.add_argument("--ood_type", default="_all", type=str)
+    parser.add_argument("--ood_setting_name", default="codellama", type=str)
     parser.add_argument("--dataset", default="HumanEval", type=str)    
     parser.add_argument("--num-samples", default=1, type=int)
     parser.add_argument("--acctual-num-samples", default=1, type=int)
@@ -328,11 +310,6 @@ def parse_args():
     parser.add_argument("--few-shot", default=0, type=int)
     parser.add_argument("--output-dir", default="outputs", type=str)
     parser.add_argument("--output-file-suffix", type=str, default="")
-    # OOD arguments
-    parser.add_argument("--ood_weights", default=None, help="Path to OOD checkpoint directory. If provided, enables soft-weighted inference.")
-    parser.add_argument("--ood_base_model", default="microsoft/codebert-base", help="Base model for OOD detector.")
-    parser.add_argument("--ood_type", default="_all", help="OOD type (e.g. '_all', '_torch').")
-    parser.add_argument("--ood_setting_name", default="codellama", help="OOD setting name.")
     args = parser.parse_args()
     return args
 
