@@ -11,8 +11,9 @@
 #SBATCH --mem=128G
 
 MODEL="codellama/CodeLlama-7b-hf"
-MODEL_NAME="SimNPO-CodeLlama-7b"
+MODEL_NAME="SimNPO-OOD-CodeLlama-7b"
 LORA_CHECKPOINT="./simnpo/ckpt/simnpo_gdr"
+OOD_WEIGHTS="./ood_checkpoints_codellama_0/"
 OUTPUT_DIR="outputs/results/model_utility"
 SUFFIX="2026"
 
@@ -22,6 +23,10 @@ export LD_LIBRARY_PATH=/home/ritsu/miniconda3/envs/simnpo/lib/python3.10/site-pa
     --model_name ${MODEL} \
     --model_path ${MODEL} \
     --lora_path ${LORA_CHECKPOINT} \
+    --ood_weights ${OOD_WEIGHTS} \
+    --ood_base_model "microsoft/codebert-base" \
+    --ood_type "_all" \
+    --ood_setting_name "codellama" \
     --dataset "HumanEval" \
     --num-samples 5 \
     --acctual-num-samples 5 \
