@@ -36,7 +36,7 @@ export LD_LIBRARY_PATH=/home/ritsu/miniconda3/envs/simnpo/lib/python3.10/site-pa
 
 /home/ritsu/miniconda3/envs/prod_eval/bin/python evaluatre.py \
     --dataset HumanEval \
-    --input_path "${OUTPUT_DIR}/HumanEval_${MODEL_NAME}_temp0.2_toppNone_topkNone_samples5_0shot_${SUFFIX}.jsonl" \
+    --input_path "${OUTPUT_DIR}/HumanEval_SimNPO-CodeLlama-7b_temp0.2_toppNone_topkNone_samples5_0shot_${SUFFIX}.jsonl" \
     --truncate \
     --eval_standard \
     --k_list 1 3 5
