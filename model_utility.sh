@@ -19,7 +19,7 @@ SUFFIX="2026"
 
 export LD_LIBRARY_PATH=/home/ritsu/miniconda3/envs/simnpo/lib/python3.10/site-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH
 
-/home/ritsu/miniconda3/envs/prod_eval/bin/python test_model_utility.py \
+/home/ritsu/miniconda3/envs/prod_eval/bin/python model_utility.py \
     --model_name ${MODEL_NAME} \
     --model_path ${MODEL} \
     --lora_path ${LORA_CHECKPOINT} \

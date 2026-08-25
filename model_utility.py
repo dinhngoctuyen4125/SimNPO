@@ -23,7 +23,7 @@ set_seed(42)
 MAX_GENERATION_LENGTH = 300
 
 
-# ---- OOD helpers (from eval_o3.py) ----
+# ---- OOD helpers (from eval_soft_infer.py) ----
 
 def gmm_cdf(x, gmm):
     w = gmm.weights_

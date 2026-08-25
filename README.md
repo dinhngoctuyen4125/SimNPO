@@ -13,30 +13,30 @@ pip install -r requirements.txt
 ### Stage 1: Train SimNPO LoRA (Unlearn Deprecated APIs)
 
 ```bash
-sudo nohup bash run_script.sh > logs/run_simnpo.log 2>&1 &
+sudo nohup bash run_simnpo.sh > logs/run_simnpo.log 2>&1 &
 ```
 
 *(Tùy chọn)* Đánh giá mis/rep/dep API sau khi train SimNPO (trên tập D_test):
 ```bash
-sudo nohup bash forget_quality.sh > logs/run_forget.log 2>&1 &
+sudo nohup bash forget_quality.sh > logs/forget_quality.log 2>&1 &
 ```
 
 ### Stage 2: Train OOD Detector
 
 ```bash
-sudo nohup bash train_ood.sh > logs/run_ood.log 2>&1 &
+sudo nohup bash train_ood.sh > logs/train_ood.log 2>&1 &
 ```
 
 ### Stage 3: Soft-Weighted Inference
 
 ```bash
-sudo nohup bash eval_soft_infer.sh > logs/sim_ood.log 2>&1 &
+sudo nohup bash eval_soft_infer.sh > logs/eval_soft_infer.log 2>&1 &
 ```
 
 ### Stage 4: Test Model Utility (HumanEval)
 
 ```bash
-sudo nohup bash test_model_utility.sh > logs/test_model_utility.log 2>&1 &
+sudo nohup bash model_utility.sh > logs/model_utility.log 2>&1 &
 ```
 
 > [!WARNING]  
@@ -48,4 +48,4 @@ sudo nohup bash test_model_utility.sh > logs/test_model_utility.log 2>&1 &
 > pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu128
 > conda install "mkl<2024.0" -c conda-forge -y
 > ```
-> *(Đừng quên sửa `test_model_utility.sh` trỏ sang `prod_eval` trước khi chạy)*
+> *(Đừng quên sửa `model_utility.sh` trỏ sang `prod_eval` trước khi chạy)*
