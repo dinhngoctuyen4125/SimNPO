@@ -205,7 +205,7 @@ def main():
     set_seed(args.seed)
     data_a = json.load(open(args.test_dataset, encoding='utf-8'))
     base_model = args.base_model
-    max_batch_size = 64
+    max_batch_size = 32
     lora_weight = args.lora_weights
     types = args.ood_type.split("_")
     ood_types = []
