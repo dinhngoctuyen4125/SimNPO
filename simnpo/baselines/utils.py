@@ -4,7 +4,7 @@ import torch
 from typing import *
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import json
-import re
+
 
 
 def get_rootpath():

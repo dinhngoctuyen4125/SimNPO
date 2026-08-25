@@ -3,26 +3,25 @@ import torch
 from tqdm import tqdm
 import numpy as np
 from torch.utils.data import DataLoader
-from transformers import RobertaConfig, RobertaTokenizer, BertConfig, BertTokenizer
+from transformers import RobertaTokenizer
 from torch.optim import AdamW
 from transformers.optimization import get_linear_schedule_with_warmup
-from src.ood_utils import set_seed, collate_fn_mlm, collate_fn, detection_performance
+from src.ood_utils import set_seed, collate_fn, detection_performance
 
 from sklearn import svm
 from sklearn.mixture import GaussianMixture as GMM
-from sklearn.cluster import DBSCAN, KMeans
-from sklearn.metrics import silhouette_score
+
 import os
 from src.ood_model_selector import RobertaForSelector
 import json
-import wandb
+
 import warnings
 from src.ood_data import load
 import pickle
 import math
 
 from scipy.stats import norm
-from scipy.optimize import minimize
+
 
 warnings.filterwarnings("ignore")
 torch.set_num_threads(10)

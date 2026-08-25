@@ -8,16 +8,16 @@ from tqdm import tqdm
 
 from src.ood_model_selector import RobertaForSelector, RobertaForSelector_inference
 
-from transformers import RobertaConfig, RobertaTokenizer, BertConfig, BertTokenizer
+from transformers import RobertaTokenizer
 
 from src.peft_model_hacked_o import PeftModel
 import pickle
 from src.modeling_llama_hacked_o import LlamaForCausalLM_ood
 import math
 import sys
-from transformers import GenerationConfig, LlamaTokenizer, AutoConfig, AutoTokenizer
+from transformers import LlamaTokenizer, AutoConfig
 from scipy.stats import norm
-from scipy.optimize import minimize
+
 import numpy as np
 from sklearn.mixture import GaussianMixture as GMM
 
@@ -33,8 +33,6 @@ try:
 except:  # noqa: E722
     pass
 
-import json
-import os.path as osp
 from typing import Union
 
 def set_seed(seed: int):

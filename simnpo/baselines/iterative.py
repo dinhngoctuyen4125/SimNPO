@@ -8,7 +8,7 @@ import transformers
 from transformers import Trainer, AutoModelForCausalLM
 from peft import LoraConfig, get_peft_model
 
-from torch import nn
+
 
 
 def unlearn(
