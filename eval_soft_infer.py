@@ -383,10 +383,13 @@ def main():
         # Generate prediction
         inputs = tokenizer(batch_prompts, padding=True, return_tensors="pt", truncation=True, max_length=MAX_PROMPT_LENGTH)
         input_ids = inputs["input_ids"].to(device)
+        attention_mask = inputs["attention_mask"].to(device)
 
         with torch.no_grad():
             generation_output = model.generate(
                 input_ids=input_ids,
+                attention_mask=attention_mask,
+                pad_token_id=tokenizer.eos_token_id,
                 return_dict_in_generate=True,
                 max_new_tokens=max_new_tokens,
             )

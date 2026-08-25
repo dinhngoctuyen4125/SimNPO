@@ -14,7 +14,7 @@ BASE_MODEL="codellama/CodeLlama-7b-hf"
 OOD_SETTING="C"
 for SEED in 0
 do
-    OUTPUT_1="./simnpo/ckpt/simnpo_gdr/checkpoint-163"
+    OUTPUT_1="./simnpo/ckpt/simnpo_gdr"
 
     # Eval on D_test.json
     TESTPATH_1="../Data-Collection/codellama/D_test.json"
