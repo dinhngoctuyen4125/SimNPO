@@ -142,10 +142,7 @@ class IterativeUnlearner(Trainer):
         loss = 0
 
         if 'simnpo' in self.loss_type:
-            # NOTE: This operates on the full logits tensor (shape [batch, seq_len, vocab_size]),
-            # not per-token log-probabilities. Verify this matches the intended SimNPO formulation.
-            neg_log_ratio = - outputs_f.logits - self.gamma
-            loss += -F.logsigmoid(self.beta * neg_log_ratio).mean() * 2 / self.beta
+            loss += -F.logsigmoid(self.beta * loss_f).mean() * 2 / self.beta
 
         else:
             raise NotImplementedError("Only SimNPO variants are supported. Loss type not recognized.")
