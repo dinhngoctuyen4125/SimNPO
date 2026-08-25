@@ -7,4 +7,4 @@ BASE_MODEL="codellama/CodeLlama-7b-hf"
     --model_path "${LORA_CHECKPOINT}" \
     --base_model "${BASE_MODEL}" \
     --batch_size 32 \
-    --max_new_tokens 256
+    --max_new_tokens 128
