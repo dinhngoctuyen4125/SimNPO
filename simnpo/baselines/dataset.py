@@ -16,7 +16,7 @@ class DefaultDataset(Dataset):
         self,
         file_path: str,
         tokenizer: AutoTokenizer | None = None,
-        max_len: int | None = 4096,
+        max_len: int | None = 512,
         add_bos_token: bool = True
     ):
         if Path(file_path).suffix == '.json':
@@ -110,7 +110,7 @@ class ForgetRetainDataset(DefaultDataset):
         forget_file_path: str,
         tokenizer: AutoTokenizer,
         retain_file_path: str | None = None,
-        max_len: int = 4096,
+        max_len: int = 512,
         add_bos_token: bool = True
     ):
         self.forget_dataset = DefaultDataset(
@@ -176,7 +176,7 @@ class DepAPIDataset(Dataset):
         - "retain": general clean code (to preserve capability)
     """
 
-    def __init__(self, json_path, tokenizer, max_len=4096):
+    def __init__(self, json_path, tokenizer, max_len=512):
         with open(json_path, 'r', encoding='utf-8') as f:
             self.data = json.load(f)
         self.tokenizer = tokenizer

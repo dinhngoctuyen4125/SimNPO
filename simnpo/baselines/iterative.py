@@ -20,13 +20,12 @@ def unlearn(
     per_device_batch_size: int = 2,
     epochs: int = 5,
     learning_rate=1e-5,
-    max_len: int = 4096,
+    max_len: int = 512,
     tokenizer_dir: str | None = None,
     resume_from_checkpoint: bool = False,
     beta: float = 0.1,
     coeff: float = 1.0,
     npo_coeff: float = 1.0,
-    gamma: float = 0.0
 ):
     if 'gdr' in loss_type and not data_file.endswith('.json'):
         assert retain_data_file is not None, "Retain data must be specified for SimNPO+GDR."
@@ -69,7 +68,8 @@ def unlearn(
         save_strategy='epoch',
         num_train_epochs=epochs,
         optim='adamw_torch',
-        lr_scheduler_type='constant',
+        lr_scheduler_type='linear',
+        warmup_ratio=0.1,
         bf16=True,
         gradient_checkpointing=True,
         report_to='none'
@@ -86,7 +86,6 @@ def unlearn(
         beta=beta,
         coeff=coeff,
         npo_coeff=npo_coeff,
-        gamma=gamma
     )
 
     model.config.use_cache = False  # silence the warnings.
@@ -105,14 +104,12 @@ class IterativeUnlearner(Trainer):
                  beta: float = 0.1,
                  coeff: float = 1.0,
                  npo_coeff: float = 1.0,
-                 gamma: float = 0.0,
                  **kwargs):
         self.loss_type = loss_type
         self.ref_model = ref_model
         self.beta = beta    # Beta parameter for SimNPO
         self.coeff = coeff
         self.npo_coeff = npo_coeff
-        self.gamma = gamma  # Gamma parameter for SimNPO
 
         super().__init__(*args, **kwargs)
 

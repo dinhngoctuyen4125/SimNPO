@@ -20,7 +20,7 @@ from src.ood_model_selector import RobertaForSelector_inference
 
 
 set_seed(42)
-MAX_GENERATION_LENGTH = 300
+MAX_GENERATION_LENGTH = 128
 
 
 # ---- OOD helpers (from eval_soft_infer.py) ----

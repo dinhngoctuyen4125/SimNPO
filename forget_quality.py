@@ -21,10 +21,10 @@ def parse_args():
     parser.add_argument("--base_model", type=str, default="codellama/CodeLlama-7b-hf",
                         help="Path to base model (default: codellama/CodeLlama-7b-hf)")
     parser.add_argument("--batch_size", type=int, default=32)
-    parser.add_argument("--max_new_tokens", type=int, default=300)
+    parser.add_argument("--max_new_tokens", type=int, default=128)
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--top_p", type=float, default=0.8)
-    parser.add_argument("--max_prompt_length", type=int, default=2048)
+    parser.add_argument("--max_prompt_length", type=int, default=512)
     return parser.parse_args()
 
 def main():

@@ -236,7 +236,7 @@ def main():
     print(result_file)
 
 
-    load_8bit = False
+
     tokenizer = LlamaTokenizer.from_pretrained(base_model, padding_side='left')
     lora_target_modules = [
         "q_proj",
@@ -252,7 +252,6 @@ def main():
     model = LlamaForCausalLM_ood.from_pretrained(
         base_model,
         config=config,
-        load_in_8bit=load_8bit,
         torch_dtype=torch.bfloat16,
         device_map="auto",
     )
@@ -272,8 +271,7 @@ def main():
     model.config.bos_token_id = 1
     model.config.eos_token_id = 2
 
-    if not load_8bit:
-        model.half()  # seems to fix bugs for some users.
+    model.half()  # seems to fix bugs for some users.
 
     model.eval()
     if torch.__version__ >= "2" and sys.platform != "win32":
@@ -319,7 +317,7 @@ def main():
 
     max_new_tokens = 128
     save_every = 200
-    MAX_PROMPT_LENGTH = 2048
+    MAX_PROMPT_LENGTH = 512
 
     num_deprecated = 0
     num_replacement = 0

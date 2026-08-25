@@ -24,7 +24,6 @@ def main():
         beta=args.beta,
         coeff=args.coeff,
         npo_coeff=args.npo_coeff,
-        gamma=args.gamma
     )
 
     return
@@ -50,7 +49,7 @@ def get_args():
         help="Path to the output model's hf directory. Creates the directory if it doesn't already exist."
     )
     parser.add_argument(
-        '--max_len', type=int, default=4096,
+        '--max_len', type=int, default=512,
         help="max length of input ids fed to the model"
     )
     parser.add_argument(
@@ -87,10 +86,7 @@ def get_args():
         help="Weight for forget loss"
     )
 
-    parser.add_argument(
-        '--gamma', type=float, default=0.1,
-        help="SimNPO gamma parameter"
-    )
+
 
     args = parser.parse_args()
 

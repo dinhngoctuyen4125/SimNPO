@@ -15,5 +15,4 @@ cd simnpo
     --per_device_batch_size 64 \
     --beta 0.1 \
     --coeff 0.1 \
-    --npo_coeff 0.1 \
-    --gamma 0.1
+    --npo_coeff 0.1
