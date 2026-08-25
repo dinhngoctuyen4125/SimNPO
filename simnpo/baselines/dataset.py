@@ -197,18 +197,29 @@ class DepAPIDataset(Dataset):
 
     def __getitem__(self, idx):
         item = self.data[idx]
-        forget_text = item["probing input"] + item["y_neg"]
+        context = item["probing input"]
+        forget_text = context + item["y_neg"]
         retain_text = item["retain"]
-        return self._tokenize(forget_text), self._tokenize(retain_text)
+
+        forget_ids = self._tokenize(forget_text)
+        retain_ids = self._tokenize(retain_text)
+
+        # Label masking: mask context portion for forget data
+        forget_labels = forget_ids.clone()
+        context_len = len(self.tokenizer(context, add_special_tokens=True).input_ids)
+        forget_labels[:min(context_len, len(forget_labels))] = -100
+
+        return (forget_ids, forget_labels), retain_ids
 
     def get_collate_fn(self):
         def collate_fn(batch):
-            batch_forget = torch.stack([pair[0] for pair in batch])
+            batch_forget_ids = torch.stack([pair[0][0] for pair in batch])
+            batch_forget_labels = torch.stack([pair[0][1] for pair in batch])
             batch_retain = torch.stack([pair[1] for pair in batch])
             dict_forget = {
-                "input_ids": batch_forget,
-                "labels": batch_forget.clone(),
-                "attention_mask": (batch_forget != self.tokenizer.pad_token_id).long()
+                "input_ids": batch_forget_ids,
+                "labels": batch_forget_labels,
+                "attention_mask": (batch_forget_ids != self.tokenizer.pad_token_id).long()
             }
             dict_retain = {
                 "input_ids": batch_retain,
